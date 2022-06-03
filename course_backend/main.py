@@ -4,8 +4,11 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from datetime import date
-from settings import DATABASE_URL
-from models import Base, Users, Courses, Videos, Purchase, AUTHER, CUSTOMER, ADMIN
+from config.settings import DATABASE_URL
+from models.course import Courses, Videos, Purchase
+from models.users import Users, AUTHER, CUSTOMER, ADMIN
+from models.base import Base
+
 
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
