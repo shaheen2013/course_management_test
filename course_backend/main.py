@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from datetime import date
 from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
-from models.users import Users, AUTHER, CUSTOMER, ADMIN
+from models.users import Users, UserType
 from models.base import Base
 
 
@@ -15,7 +15,7 @@ Session = sessionmaker(bind=engine)
 
 
 def recreate_database():
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
 
@@ -24,20 +24,9 @@ recreate_database()
 app = FastAPI()
 
 
-@app.get("/")
-def root():
-    return {"message": "Home"}
-
-
 @app.post("/user/create")
-async def create_user(name: str, email: str, address: str, hashed_password: str, user_type: int):
+async def create_user(name: str, email: str, address: str, hashed_password: str, user_type: UserType):
     session = Session()
-    if user_type not in [AUTHER, CUSTOMER, ADMIN]:
-        return JSONResponse(status_code=200, content={
-            "status_code": 200,
-            "message": "user type must be 1, 2 or 3"
-        })
-
     user = Users(
         name=name,
         email=email,
@@ -118,27 +107,27 @@ async def delete_user(id: int):
 
 @app.post("/course/create")
 async def create_course(user_id: int, title: str, price: float, thumbnail_url: str):
-
     session = Session()
     user = session.query(Users).filter(Users.id == user_id).first()
-    if user.user_type != AUTHER:
+    if user:
+        if user.user_type != UserType.AUTHER:
+            return JSONResponse(status_code=200, content={
+                "status_code": 200,
+                "message": "User must be author!"
+            })
+        course = Courses(
+            user_id=user_id,
+            title=title,
+            price=price,
+            thumbnail_url=thumbnail_url
+        )
+        session.add(course)
+        session.commit()
+        session.close()
         return JSONResponse(status_code=200, content={
             "status_code": 200,
-            "message": "invalid user"
+            "message": "success"
         })
-    course = Courses(
-        user_id=user_id,
-        title=title,
-        price=price,
-        thumbnail_url=thumbnail_url
-    )
-    session.add(course)
-    session.commit()
-    session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
 
 
 @app.get("/course/{id}")
@@ -277,23 +266,24 @@ async def find_video_course_wise(course_id: int):
 async def purchase_create(course_id: int, user_id: int, purchase_amount: float):
     session = Session()
     user = session.query(Users).filter(Users.id == user_id).first()
-    if user.user_type != CUSTOMER:
+    if user:
+        if user.user_type != UserType.CUSTOMER:
+            return JSONResponse(status_code=200, content={
+                "status_code": 200,
+                "message": "User must be customer!"
+            })
+        purchase = Purchase(
+            course_id=course_id,
+            user_id=user_id,
+            purchase_amount=purchase_amount,
+        )
+        session.add(purchase)
+        session.commit()
+        session.close()
         return JSONResponse(status_code=200, content={
             "status_code": 200,
-            "message": "invalid user"
+            "message": "success"
         })
-    purchase = Purchase(
-        course_id=course_id,
-        user_id=user_id,
-        purchase_amount=purchase_amount,
-    )
-    session.add(purchase)
-    session.commit()
-    session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
 
 
 @app.exception_handler(Exception)
