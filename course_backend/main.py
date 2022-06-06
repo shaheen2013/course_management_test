@@ -40,10 +40,7 @@ async def find_user(id: int):
     session = Session()
     user = session.query(Users).filter(Users.id == id).first()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "result": jsonable_encoder({"user": user})
-    })
+    return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"user": user})))
 
 
 @app.get("/users")
@@ -54,10 +51,7 @@ async def get_users(page_size: int = 10, page: int = 1):
     session = Session()
     users = session.query(Users).limit(page_size).offset(page * page_size).all()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "result": jsonable_encoder({"users": users})
-    })
+    return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"users": users})))
 
 
 @app.put("/user/update")
@@ -86,10 +80,7 @@ async def create_course(course: CreateCourseData):
     user = session.query(Users).filter(Users.id == course.get("user_id")).first()
     if user:
         if user.user_type != UserType.AUTHER:
-            return JSONResponse(status_code=200, content={
-                "status_code": 200,
-                "message": "User must be author!"
-            })
+            return JSONResponse(status_code=200, content=get_invalid_msg("User must be author!"))
         session.add(Courses(**course))
         session.commit()
         session.close()
@@ -101,10 +92,7 @@ async def find_course(id: int):
     session = Session()
     course = session.query(Courses).filter(Courses.id == id).first()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "result": jsonable_encoder({"courses": course})
-    })
+    return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"courses": course})))
 
 
 @app.get("/courses")
@@ -115,10 +103,7 @@ async def get_courses(page_size: int = 10, page: int = 1):
     session = Session()
     courses = session.query(Courses).limit(page_size).offset(page * page_size).all()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "result": jsonable_encoder({"courses": courses})
-    })
+    return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"courses": courses})))
 
 
 @app.put("/course/update")
@@ -173,10 +158,7 @@ async def find_video_course_wise(course_id: int):
     session = Session()
     videos = session.query(Videos).filter(Videos.course_id == course_id)
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "result": jsonable_encoder({"videos": videos})
-    })
+    return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"videos": videos})))
 
 
 @app.post("/purchase/create")
@@ -186,14 +168,25 @@ async def purchase_create(purchase: CreatePurchaseData):
     user = session.query(Users).filter(Users.id == purchase.get("user_id")).first()
     if user:
         if user.user_type != UserType.CUSTOMER:
-            return JSONResponse(status_code=200, content={
-                "status_code": 200,
-                "message": "User must be customer!"
-            })
+            return JSONResponse(status_code=200, content=get_invalid_msg("User must be customer!"))
         session.add(Purchase(**purchase))
         session.commit()
         session.close()
         return JSONResponse(status_code=200, content=get_success_msg())
+
+
+def get_invalid_msg(msg):
+    return {
+        "status_code": 200,
+        "message": msg
+    }
+
+
+def get_response_data(data):
+    return {
+        "status_code": 200,
+        "result": data
+    }
 
 
 def get_success_msg():
