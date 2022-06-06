@@ -10,6 +10,7 @@ from models.users import Users, UserType
 from models.base import Base
 from data_parsing import UpdateUserData, CreateUserData, CreateCourseData, \
     UpdateCourseData, CreateVideosData, UpdateVideosData, CreatePurchaseData, UpdatePurchaseData
+from utils import *
 
 
 engine = create_engine(DATABASE_URL)
@@ -168,27 +169,6 @@ def update_model_data(model, data):
     session.add(session.merge(model(**data.dict())))
     session.commit()
     session.close()
-
-
-def get_invalid_msg(msg):
-    return {
-        "status_code": 200,
-        "message": msg
-    }
-
-
-def get_response_data(data):
-    return {
-        "status_code": 200,
-        "result": data
-    }
-
-
-def get_success_msg():
-    return {
-        "status_code": 200,
-        "message": "success"
-    }
 
 
 @app.exception_handler(Exception)
