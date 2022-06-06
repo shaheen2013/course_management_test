@@ -28,10 +28,7 @@ app = FastAPI()
 
 @app.post("/user/create")
 async def create_user(user_data: CreateUserData):
-    session = Session()
-    session.add(Users(**user_data.dict()))
-    session.commit()
-    session.close()
+    add_model_data(Users, user_data)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
@@ -56,20 +53,13 @@ async def get_users(page_size: int = 10, page: int = 1):
 
 @app.put("/user/update")
 async def update_user(user: UpdateUserData):
-    session = Session()
-    session.add(session.merge(Users(**user.dict())))
-    session.commit()
-    session.close()
+    update_model_data(Users, user)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/user/delete")
 async def delete_user(id: int):
-    session = Session()
-    user = session.query(Users).get(id)
-    session.delete(user)
-    session.commit()
-    session.close()
+    delete_model_data(Users, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
@@ -108,48 +98,31 @@ async def get_courses(page_size: int = 10, page: int = 1):
 
 @app.put("/course/update")
 async def update_course(course: UpdateCourseData):
-    session = Session()
-    session.add(session.merge(Courses(**course.dict())))
-    session.commit()
-    session.close()
+    update_model_data(Courses, course)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/course/delete")
 async def delete_course(id: int):
-    session = Session()
-    course = session.query(Courses).get(id)
-    session.delete(course)
-    session.commit()
-    session.close()
+    delete_model_data(Courses, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.post("/course/video/create")
 async def create_video(video: CreateVideosData):
-    session = Session()
-    session.add(Videos(**video.dict()))
-    session.commit()
-    session.close()
+    add_model_data(Videos, video)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.put("/course/video/update")
 async def update_video(video: UpdateVideosData):
-    session = Session()
-    session.add(session.merge(Videos(**video.dict())))
-    session.commit()
-    session.close()
+    update_model_data(Videos, video)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/course/video/delete")
 async def delete_video(id: int):
-    session = Session()
-    video = session.query(Videos).get(id)
-    session.delete(video)
-    session.commit()
-    session.close()
+    delete_model_data(Videos, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
@@ -173,6 +146,28 @@ async def purchase_create(purchase: CreatePurchaseData):
         session.commit()
         session.close()
         return JSONResponse(status_code=200, content=get_success_msg())
+
+
+def delete_model_data(model, id):
+    session = Session()
+    obj = session.query(model).get(id)
+    session.delete(obj)
+    session.commit()
+    session.close()
+
+
+def add_model_data(model, data):
+    session = Session()
+    session.add(model(**data.dict()))
+    session.commit()
+    session.close()
+
+
+def update_model_data(model, data):
+    session = Session()
+    session.add(session.merge(model(**data.dict())))
+    session.commit()
+    session.close()
 
 
 def get_invalid_msg(msg):
