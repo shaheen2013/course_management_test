@@ -8,7 +8,8 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
-from data_parsing import UpdateUserData, CreateUserData, CreateCourseData, UpdateCourseData
+from data_parsing import UpdateUserData, CreateUserData, CreateCourseData, \
+    UpdateCourseData, CreateVideosData, UpdateVideosData, CreatePurchaseData, UpdatePurchaseData
 
 
 engine = create_engine(DATABASE_URL)
@@ -140,40 +141,18 @@ async def delete_course(id: int):
 
 
 @app.post("/course/video/create")
-async def create_video(course_id: int, title: str, duration: int, description: str, video_url: str, thumbnail_url: str):
+async def create_video(video: CreateVideosData):
     session = Session()
-    video = Videos(
-        course_id=course_id,
-        title=title,
-        duration=duration,
-        description=description,
-        video_url=video_url,
-        thumbnail_url=thumbnail_url
-    )
-    session.add(video)
+    session.add(Videos(**video.dict()))
     session.commit()
     session.close()
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.put("/course/video/update")
-async def update_video(id: int, course_id: int = None, title: str = None, duration: int = None,
-                       description: str = None, video_url: str = None, thumbnail_url: str = None):
+async def update_video(video: UpdateVideosData):
     session = Session()
-    video = session.query(Videos).get(id)
-    if course_id is not None:
-        video.course_id = course_id
-    if title is not None:
-        video.title = title
-    if duration is not None:
-        video.duration = duration
-    if description is not None:
-        video.description = description
-    if video_url is not None:
-        video.video_url = video_url
-    if thumbnail_url is not None:
-        video.thumbnail_url = thumbnail_url
-    video.updated_at = date.today()
+    session.add(session.merge(Videos(**video.dict())))
     session.commit()
     session.close()
     return JSONResponse(status_code=200, content=get_success_msg())
@@ -201,21 +180,17 @@ async def find_video_course_wise(course_id: int):
 
 
 @app.post("/purchase/create")
-async def purchase_create(course_id: int, user_id: int, purchase_amount: float):
+async def purchase_create(purchase: CreatePurchaseData):
     session = Session()
-    user = session.query(Users).filter(Users.id == user_id).first()
+    purchase = purchase.dict()
+    user = session.query(Users).filter(Users.id == purchase.get("user_id")).first()
     if user:
         if user.user_type != UserType.CUSTOMER:
             return JSONResponse(status_code=200, content={
                 "status_code": 200,
                 "message": "User must be customer!"
             })
-        purchase = Purchase(
-            course_id=course_id,
-            user_id=user_id,
-            purchase_amount=purchase_amount,
-        )
-        session.add(purchase)
+        session.add(Purchase(**purchase))
         session.commit()
         session.close()
         return JSONResponse(status_code=200, content=get_success_msg())
