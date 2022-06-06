@@ -8,6 +8,7 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
+from data_parsing import UsersData
 
 
 engine = create_engine(DATABASE_URL)
@@ -25,16 +26,9 @@ app = FastAPI()
 
 
 @app.post("/user/create")
-async def create_user(name: str, email: str, address: str, hashed_password: str, user_type: UserType):
+async def create_user(user_data: UsersData):
     session = Session()
-    user = Users(
-        name=name,
-        email=email,
-        address=address,
-        hashed_password=hashed_password,
-        user_type=user_type,
-    )
-    session.add(user)
+    session.add(Users(**user_data.dict()))
     session.commit()
     session.close()
     return JSONResponse(status_code=200, content={
