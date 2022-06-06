@@ -1,5 +1,5 @@
-from .base_parsing import BaseDataModel
-# from ..models import UserType
+from .base_parsing import UpdateBaseModelData, CreateBaseDataModel
+from pydantic import BaseModel
 from enum import Enum
 
 
@@ -9,10 +9,18 @@ class UserType(str, Enum):
     CUSTOMER = "Customer"
 
 
-class UsersData(BaseDataModel):
+class UserData(BaseModel):
     name: str
     email: str
-    hashed_password: str
-    is_active: bool = True
-    user_type: UserType
     address = str
+    is_active: bool = True
+
+
+class CreateUserData(UserData, CreateBaseDataModel):
+    hashed_password: str
+    user_type: UserType
+
+
+class UpdateUserData(UserData):
+    pass
+

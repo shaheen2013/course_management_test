@@ -1,1 +1,1 @@
-from .users_parsing import UsersData
+from .users_parsing import UpdateUserData, CreateUserData

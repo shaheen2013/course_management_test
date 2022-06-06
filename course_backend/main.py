@@ -8,7 +8,7 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
-from data_parsing import UsersData
+from data_parsing import UpdateUserData, CreateUserData
 
 
 engine = create_engine(DATABASE_URL)
@@ -26,7 +26,7 @@ app = FastAPI()
 
 
 @app.post("/user/create")
-async def create_user(user_data: UsersData):
+async def create_user(user_data: CreateUserData):
     session = Session()
     session.add(Users(**user_data.dict()))
     session.commit()
@@ -67,16 +67,11 @@ async def get_users(page_size: int = 10, page: int = 1):
 
 
 @app.put("/user/update")
-async def update_user(id: int, name: str = None, email: str = None, address: str = None):
+async def update_user(user_id: int, user: UpdateUserData):
     session = Session()
-    user = session.query(Users).get(id)
-    if name is not None:
-        user.name = name
-    if email is not None:
-        user.email = email
-    if address is not None:
-        user.address = address
-    user.updated_at = date.today()
+    user = user.dict()
+    user.update({"id": user_id})
+    session.add(session.merge(Users(**user)))
     session.commit()
     session.close()
     return JSONResponse(status_code=200, content={
