@@ -8,7 +8,7 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
-from data_parsing import UpdateUserData, CreateUserData
+from data_parsing import UpdateUserData, CreateUserData, CreateCourseData, UpdateCourseData
 
 
 engine = create_engine(DATABASE_URL)
@@ -31,10 +31,7 @@ async def create_user(user_data: CreateUserData):
     session.add(Users(**user_data.dict()))
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.get("/user/{id}")
@@ -42,10 +39,9 @@ async def find_user(id: int):
     session = Session()
     user = session.query(Users).filter(Users.id == id).first()
     session.close()
-    result = jsonable_encoder({"user": user})
     return JSONResponse(status_code=200, content={
         "status_code": 200,
-        "result": result
+        "result": jsonable_encoder({"user": user})
     })
 
 
@@ -57,27 +53,19 @@ async def get_users(page_size: int = 10, page: int = 1):
     session = Session()
     users = session.query(Users).limit(page_size).offset(page * page_size).all()
     session.close()
-    result = jsonable_encoder({
-        "users": users
-    })
     return JSONResponse(status_code=200, content={
         "status_code": 200,
-        "result": result
+        "result": jsonable_encoder({"users": users})
     })
 
 
 @app.put("/user/update")
-async def update_user(user_id: int, user: UpdateUserData):
+async def update_user(user: UpdateUserData):
     session = Session()
-    user = user.dict()
-    user.update({"id": user_id})
-    session.add(session.merge(Users(**user)))
+    session.add(session.merge(Users(**user.dict())))
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/user/delete")
@@ -87,36 +75,24 @@ async def delete_user(id: int):
     session.delete(user)
     session.commit()
     session.close()
-
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.post("/course/create")
-async def create_course(user_id: int, title: str, price: float, thumbnail_url: str):
+async def create_course(course: CreateCourseData):
     session = Session()
-    user = session.query(Users).filter(Users.id == user_id).first()
+    course = course.dict()
+    user = session.query(Users).filter(Users.id == course.get("user_id")).first()
     if user:
         if user.user_type != UserType.AUTHER:
             return JSONResponse(status_code=200, content={
                 "status_code": 200,
                 "message": "User must be author!"
             })
-        course = Courses(
-            user_id=user_id,
-            title=title,
-            price=price,
-            thumbnail_url=thumbnail_url
-        )
-        session.add(course)
+        session.add(Courses(**course))
         session.commit()
         session.close()
-        return JSONResponse(status_code=200, content={
-            "status_code": 200,
-            "message": "success"
-        })
+        return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.get("/course/{id}")
@@ -124,10 +100,9 @@ async def find_course(id: int):
     session = Session()
     course = session.query(Courses).filter(Courses.id == id).first()
     session.close()
-    result = jsonable_encoder({"courses": course})
     return JSONResponse(status_code=200, content={
         "status_code": 200,
-        "result": result
+        "result": jsonable_encoder({"courses": course})
     })
 
 
@@ -139,32 +114,19 @@ async def get_courses(page_size: int = 10, page: int = 1):
     session = Session()
     courses = session.query(Courses).limit(page_size).offset(page * page_size).all()
     session.close()
-    result = jsonable_encoder({
-        "courses": courses
-    })
     return JSONResponse(status_code=200, content={
         "status_code": 200,
-        "result": result
+        "result": jsonable_encoder({"courses": courses})
     })
 
 
 @app.put("/course/update")
-async def update_course(id: int, title: str = None, price: float = None, thumbnail_url: str = None):
+async def update_course(course: UpdateCourseData):
     session = Session()
-    course = session.query(Courses).get(id)
-    if title is not None:
-        course.title = title
-    if price is not None:
-        course.price = price
-    if thumbnail_url is not None:
-        course.thumbnail_url = thumbnail_url
-    course.updated_at = date.today()
+    session.add(session.merge(Courses(**course.dict())))
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/course/delete")
@@ -174,10 +136,7 @@ async def delete_course(id: int):
     session.delete(course)
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.post("/course/video/create")
@@ -194,10 +153,7 @@ async def create_video(course_id: int, title: str, duration: int, description: s
     session.add(video)
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.put("/course/video/update")
@@ -220,10 +176,7 @@ async def update_video(id: int, course_id: int = None, title: str = None, durati
     video.updated_at = date.today()
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.delete("/course/video/delete")
@@ -233,10 +186,7 @@ async def delete_video(id: int):
     session.delete(video)
     session.commit()
     session.close()
-    return JSONResponse(status_code=200, content={
-        "status_code": 200,
-        "message": "success"
-    })
+    return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @app.get("/course/video/{course_id}")
@@ -244,10 +194,9 @@ async def find_video_course_wise(course_id: int):
     session = Session()
     videos = session.query(Videos).filter(Videos.course_id == course_id)
     session.close()
-    result = jsonable_encoder({"videos": videos})
     return JSONResponse(status_code=200, content={
         "status_code": 200,
-        "result": result
+        "result": jsonable_encoder({"videos": videos})
     })
 
 
@@ -269,10 +218,14 @@ async def purchase_create(course_id: int, user_id: int, purchase_amount: float):
         session.add(purchase)
         session.commit()
         session.close()
-        return JSONResponse(status_code=200, content={
-            "status_code": 200,
-            "message": "success"
-        })
+        return JSONResponse(status_code=200, content=get_success_msg())
+
+
+def get_success_msg():
+    return {
+        "status_code": 200,
+        "message": "success"
+    }
 
 
 @app.exception_handler(Exception)

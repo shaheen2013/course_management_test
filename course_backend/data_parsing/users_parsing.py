@@ -21,6 +21,6 @@ class CreateUserData(UserData, CreateBaseDataModel):
     user_type: UserType
 
 
-class UpdateUserData(UserData):
+class UpdateUserData(UserData, UpdateBaseModelData):
     pass
 
