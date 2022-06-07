@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
-from course_backend.config.database import Session
-from course_backend.models.course import Purchase
-from course_backend.models.users import Users, UserType
-from course_backend.schemas import CreatePurchase
-from course_backend.utils import *
+from course.config.database import Session
+from course.models.course import Purchase
+from course.models.users import Users, UserType
+from course.schemas import CreatePurchase
+from course.utils import *
 
 
 router = APIRouter(

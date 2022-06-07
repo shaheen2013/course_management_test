@@ -1,12 +1,12 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from course_backend.models.users import Users
-from course_backend.schemas import UpdateUser, CreateUser
-from course_backend.utils import *
-from course_backend.utils.hashing import Hash
+from course.models.users import Users
+from course.schemas import UpdateUser, CreateUser
+from course.utils import *
+from course.utils.hashing import Hash
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from course_backend.config.database import Session, add_model_data, update_model_data,\
+from course.config.database import Session, add_model_data, update_model_data,\
     delete_model_data
 
 

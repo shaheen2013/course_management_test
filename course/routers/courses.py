@@ -3,15 +3,15 @@ from sqlalchemy.orm import Session
 
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from course_backend.config.database import Session, add_model_data, update_model_data,\
+from course.config.database import Session, add_model_data, update_model_data,\
     delete_model_data
-from course_backend.models.course import Courses, Videos, Purchase
-from course_backend.config.settings import BASE_DIR, DOMAIN_NAME
-from course_backend.models.users import Users, UserType
-from course_backend.schemas import CreateCourse, \
+from course.models.course import Courses, Videos, Purchase
+from course.config.settings import BASE_DIR, DOMAIN_NAME
+from course.models.users import Users, UserType
+from course.schemas import CreateCourse, \
     UpdateCourse, TokenUser
-from course_backend.utils import *
-from course_backend.authentication import oauth2
+from course.utils import *
+from course.authentication import oauth2
 from fastapi import File, UploadFile
 import shutil
 

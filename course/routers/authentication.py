@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from course_backend import models
-from course_backend.utils.hashing import Hash
-from course_backend.authentication import token
-from course_backend.config import database
+from course import models
+from course.utils.hashing import Hash
+from course.authentication import token
+from course.config import database
 from sqlalchemy.orm import Session
 
 router = APIRouter(tags=['Authentication'])

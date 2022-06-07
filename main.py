@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from course_backend.config.database import recreate_database
-from course_backend.routers import authentication, users, courses, purchase
+from course.config.database import recreate_database
+from course.routers import authentication, users, courses, purchase
 
 recreate_database()
 app = FastAPI()
