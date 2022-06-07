@@ -15,9 +15,9 @@ router = APIRouter(
 
 
 @router.post("/create")
-async def purchase_create(purchase: CreatePurchase):
+async def purchase_create(request: CreatePurchase):
     session = Session()
-    purchase = purchase.dict()
+    purchase = request.dict()
     user = session.query(Users).filter(Users.id == purchase.get("user_id")).first()
     if user:
         if user.user_type != UserType.CUSTOMER:

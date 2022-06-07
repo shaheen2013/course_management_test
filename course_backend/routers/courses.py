@@ -19,9 +19,9 @@ router = APIRouter(
 
 
 @router.post("/create")
-async def create_course(course: CreateCourse):
+async def create_course(request: CreateCourse):
     session = Session()
-    course = course.dict()
+    course = request.dict()
     user = session.query(Users).filter(Users.id == course.get("user_id")).first()
     if user:
         if user.user_type != UserType.AUTHER:
@@ -64,14 +64,14 @@ async def delete_course(id: int):
 
 
 @router.post("/video/create")
-async def create_video(video: CreateVideos):
-    add_model_data(Videos, video.dict())
+async def create_video(request: CreateVideos):
+    add_model_data(Videos, request.dict())
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @router.put("/video/update")
-async def update_video(video: UpdateVideosData):
-    update_model_data(Videos, video)
+async def update_video(request: UpdateVideosData):
+    update_model_data(Videos, request)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 

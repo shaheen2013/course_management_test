@@ -17,8 +17,8 @@ router = APIRouter(
 
 
 @router.post("/create")
-async def create_user(user_data: CreateUser):
-    user_data = user_data.dict()
+async def create_user(request: CreateUser):
+    user_data = request.dict()
     user_data.update({"hashed_password": Hash.bcrypt(user_data.get("hashed_password"))})
     add_model_data(Users, user_data)
     return JSONResponse(status_code=200, content=get_success_msg())
@@ -44,8 +44,8 @@ async def get_users(page_size: int = 10, page: int = 1):
 
 
 @router.put("/update")
-async def update_user(user: UpdateUser):
-    update_model_data(Users, user)
+async def update_user(request: UpdateUser):
+    update_model_data(Users, request)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
