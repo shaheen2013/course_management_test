@@ -1,13 +1,7 @@
 from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
 from pydantic import BaseModel, EmailStr, SecretStr
-from enum import Enum
 from typing import Optional
-
-
-class UserType(str, Enum):
-    ADMIN = "Admin"
-    AUTHER = "Author"
-    CUSTOMER = "Customer"
+from course.models import UserType
 
 
 class UserData(BaseModel):
@@ -18,7 +12,7 @@ class UserData(BaseModel):
 
 
 class CreateUser(UserData, CreateBaseDataModel):
-    hashed_password: SecretStr
+    hashed_password: str
     user_type: UserType
 
 

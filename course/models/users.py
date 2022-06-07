@@ -18,4 +18,3 @@ class Users(Base, BaseModel):
     is_active = Column(Boolean, default=True)
     user_type = Column(String, nullable=False)
     address = Column(String, nullable=True)
-    # role = Column(String, nullable=True)
