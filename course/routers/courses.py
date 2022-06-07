@@ -37,7 +37,7 @@ async def create_course(request: CreateCourse, current_user: TokenUser = Depends
 
 
 @router.get("/{id}")
-async def find_course(id: int):
+async def find_course(id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     session = Session()
     course = session.query(Courses).filter(Courses.id == id).first()
     session.close()
@@ -45,7 +45,7 @@ async def find_course(id: int):
 
 
 @router.get("/list")
-async def get_courses(page_size: int = 10, page: int = 1):
+async def get_courses(page_size: int = 10, page: int = 1, current_user: TokenUser = Depends(oauth2.get_current_user)):
     if (page_size > 100 or page_size < 0):
         page_size = 100
     page -= 1
@@ -56,20 +56,21 @@ async def get_courses(page_size: int = 10, page: int = 1):
 
 
 @router.put("/update")
-async def update_course(course: UpdateCourse):
+async def update_course(course: UpdateCourse, current_user: TokenUser = Depends(oauth2.get_current_user)):
     update_model_data(Courses, course)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @router.delete("/delete")
-async def delete_course(id: int):
+async def delete_course(id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     delete_model_data(Courses, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @router.put("/video/upload/")
-async def update_user(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
-                      thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
+async def video_upload(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
+                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None),
+                       current_user: TokenUser = Depends(oauth2.get_current_user)):
     video_obj_data = {
        'course_id': course_id,
        "title": title,
@@ -98,7 +99,8 @@ def upload_file(file_obj):
 
 @router.put("/video/update")
 async def update_video(id: int, course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
-                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
+                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None),
+                       current_user: TokenUser = Depends(oauth2.get_current_user)):
     video_obj_data = {
        'id': id,
        'course_id': course_id,
@@ -117,13 +119,13 @@ async def update_video(id: int, course_id: int, title: str, description: str, du
 
 
 @router.delete("/video/delete")
-async def delete_video(id: int):
+async def delete_video(id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     delete_model_data(Videos, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @router.get("/video/{course_id}")
-async def find_video_course_wise(course_id: int):
+async def find_video_course_wise(course_id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     session = Session()
     videos = session.query(Videos).filter(Videos.course_id == course_id)
     session.close()
