@@ -66,12 +66,6 @@ async def delete_course(id: int):
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
-@router.post("/video/create")
-async def create_video(request: CreateVideos):
-    add_model_data(Videos, request.dict())
-    return JSONResponse(status_code=200, content=get_success_msg())
-
-
 @router.put("/video/upload/")
 async def update_user(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
