@@ -8,7 +8,7 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
-from data_parsing import UpdateUserData, CreateUserData, CreateCourseData, \
+from schemas import UpdateUserData, CreateUserData, CreateCourseData, \
     UpdateCourseData, CreateVideosData, UpdateVideosData, CreatePurchaseData, UpdatePurchaseData
 from utils import *
 

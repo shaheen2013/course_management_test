@@ -1,4 +1,4 @@
-from .base_parsing import UpdateBaseModelData, CreateBaseDataModel
+from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
 from pydantic import BaseModel
 
 
