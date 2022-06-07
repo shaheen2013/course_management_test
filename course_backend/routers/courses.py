@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from fastapi.responses import JSONResponse
@@ -9,8 +9,9 @@ from course_backend.models.course import Courses, Videos, Purchase
 from course_backend.config.settings import BASE_DIR, DOMAIN_NAME
 from course_backend.models.users import Users, UserType
 from course_backend.schemas import CreateCourse, \
-    UpdateCourse, CreateVideos, UpdateVideos
+    UpdateCourse, TokenUser
 from course_backend.utils import *
+from course_backend.authentication import oauth2
 from fastapi import File, UploadFile
 import shutil
 
@@ -22,7 +23,7 @@ router = APIRouter(
 
 
 @router.post("/create")
-async def create_course(request: CreateCourse):
+async def create_course(request: CreateCourse, current_user: TokenUser = Depends(oauth2.get_current_user)):
     session = Session()
     course = request.dict()
     user = session.query(Users).filter(Users.id == course.get("user_id")).first()

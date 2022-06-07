@@ -1,6 +1,7 @@
 from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
 from pydantic import BaseModel, EmailStr, SecretStr
 from enum import Enum
+from typing import Optional
 
 
 class UserType(str, Enum):
@@ -24,3 +25,12 @@ class CreateUser(UserData, CreateBaseDataModel):
 class UpdateUser(UserData, UpdateBaseModelData):
     pass
 
+
+class TokenUser(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
