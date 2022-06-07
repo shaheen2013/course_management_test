@@ -29,7 +29,7 @@ class CreateVideos(VideosData, CreateBaseDataModel):
     course_id: int
 
 
-class UpdateVideosData(VideosData, UpdateBaseModelData):
+class UpdateVideos(VideosData, UpdateBaseModelData):
     pass
 
 

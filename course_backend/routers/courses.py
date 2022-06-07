@@ -9,7 +9,7 @@ from course_backend.models.course import Courses, Videos, Purchase
 from course_backend.config.settings import BASE_DIR, DOMAIN_NAME
 from course_backend.models.users import Users, UserType
 from course_backend.schemas import CreateCourse, \
-    UpdateCourse, CreateVideos, UpdateVideosData
+    UpdateCourse, CreateVideos, UpdateVideos
 from course_backend.utils import *
 from fastapi import File, UploadFile
 import shutil
@@ -75,24 +75,13 @@ async def create_video(request: CreateVideos):
 @router.put("/video/upload/")
 async def update_user(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
-
-    with open(f'./media/{thumbnail_url.filename}', 'wb') as buffer:
-        shutil.copyfileobj(thumbnail_url.file, buffer)
-
-    with open(f'./media/{video_url.filename}', 'wb') as buffer:
-        shutil.copyfileobj(video_url.file, buffer)
-
-    video_url = DOMAIN_NAME + str('/media/{0}').format(video_url.filename)
-    thumbnail_url = DOMAIN_NAME + str('/media/{0}').format(thumbnail_url.filename)
-
     video_obj = Videos(course_id=course_id,
                        title=title,
                        description=description,
                        duration=duration,
                        free_preview=free_preview,
-                       video_url=video_url,
-                       thumbnail_url=thumbnail_url)
-
+                       video_url=upload_file(video_url),
+                       thumbnail_url=upload_file(thumbnail_url))
     session = Session()
     session.add(video_obj)
     session.commit()
@@ -100,8 +89,14 @@ async def update_user(course_id: int, title: str, description: str, duration: in
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
+def upload_file(file_obj):
+    with open(f'./media/{file_obj.filename}', 'wb') as buffer:
+        shutil.copyfileobj(file_obj.file, buffer)
+    return DOMAIN_NAME + str('/media/{0}').format(file_obj.filename)
+
+
 @router.put("/video/update")
-async def update_video(request: UpdateVideosData):
+async def update_video(request: UpdateVideos):
     update_model_data(Videos, request)
     return JSONResponse(status_code=200, content=get_success_msg())
 
