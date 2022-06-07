@@ -69,13 +69,16 @@ async def delete_course(id: int):
 @router.put("/video/upload/")
 async def update_user(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
-    video_obj = Videos(course_id=course_id,
-                       title=title,
-                       description=description,
-                       duration=duration,
-                       free_preview=free_preview,
-                       video_url=upload_file(video_url),
-                       thumbnail_url=upload_file(thumbnail_url))
+    video_obj_data = {
+       'course_id': course_id,
+       "title": title,
+       "description": description,
+       "duration": duration,
+       "free_preview": free_preview,
+       "video_url": upload_file(video_url),
+       "thumbnail_url": upload_file(thumbnail_url)
+    }
+    video_obj = Videos(**video_obj_data)
     session = Session()
     session.add(video_obj)
     session.commit()
@@ -84,14 +87,31 @@ async def update_user(course_id: int, title: str, description: str, duration: in
 
 
 def upload_file(file_obj):
-    with open(f'./media/{file_obj.filename}', 'wb') as buffer:
-        shutil.copyfileobj(file_obj.file, buffer)
-    return DOMAIN_NAME + str('/media/{0}').format(file_obj.filename)
+    try:
+        with open(f'./media/{file_obj.filename}', 'wb') as buffer:
+            shutil.copyfileobj(file_obj.file, buffer)
+        return DOMAIN_NAME + str('/media/{0}').format(file_obj.filename)
+    except Exception as e:
+        return ""
 
 
 @router.put("/video/update")
-async def update_video(request: UpdateVideos):
-    update_model_data(Videos, request)
+async def update_video(id: int, course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
+                       thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
+    video_obj_data = {
+       'id': id,
+       'course_id': course_id,
+       "title": title,
+       "description": description,
+       "duration": duration,
+       "free_preview": free_preview,
+       "video_url": upload_file(video_url),
+       "thumbnail_url": upload_file(thumbnail_url)
+    }
+    session = Session()
+    session.add(session.merge(Videos(**video_obj_data)))
+    session.commit()
+    session.close()
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
