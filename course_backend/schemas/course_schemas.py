@@ -1,5 +1,5 @@
 from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
-from pydantic import BaseModel
+from pydantic import BaseModel, FilePath
 
 
 class CourseData(BaseModel):
@@ -19,8 +19,8 @@ class UpdateCourse(CourseData, UpdateBaseModelData):
 class VideosData(BaseModel):
     title: str
     description: str
-    video_url: str
-    thumbnail_url: str
+    video_url: FilePath
+    thumbnail_url: FilePath
     duration: int
     free_preview: bool = False
 

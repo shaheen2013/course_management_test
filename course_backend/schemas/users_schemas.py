@@ -1,5 +1,5 @@
 from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, SecretStr
 from enum import Enum
 
 
@@ -17,7 +17,7 @@ class UserData(BaseModel):
 
 
 class CreateUser(UserData, CreateBaseDataModel):
-    hashed_password: str
+    hashed_password: SecretStr
     user_type: UserType
 
 

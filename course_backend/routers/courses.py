@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from course_backend.config.database import Session, add_model_data, update_model_data,\
     delete_model_data
 from course_backend.models.course import Courses, Videos, Purchase
+from course_backend.config.settings import BASE_DIR, DOMAIN_NAME
 from course_backend.models.users import Users, UserType
 from course_backend.schemas import CreateCourse, \
     UpdateCourse, CreateVideos, UpdateVideosData
@@ -68,6 +69,34 @@ async def delete_course(id: int):
 @router.post("/video/create")
 async def create_video(request: CreateVideos):
     add_model_data(Videos, request.dict())
+    return JSONResponse(status_code=200, content=get_success_msg())
+
+
+@router.put("/video/upload/")
+async def update_user(course_id: int, title: str, description: str, duration: int, free_preview: bool = False,
+                      thumbnail_url: UploadFile = File(None), video_url: UploadFile = File(None)):
+
+    with open(f'./media/{thumbnail_url.filename}', 'wb') as buffer:
+        shutil.copyfileobj(thumbnail_url.file, buffer)
+
+    with open(f'./media/{video_url.filename}', 'wb') as buffer:
+        shutil.copyfileobj(video_url.file, buffer)
+
+    video_url = DOMAIN_NAME + str('/media/{0}').format(video_url.filename)
+    thumbnail_url = DOMAIN_NAME + str('/media/{0}').format(thumbnail_url.filename)
+
+    video_obj = Videos(course_id=course_id,
+                       title=title,
+                       description=description,
+                       duration=duration,
+                       free_preview=free_preview,
+                       video_url=video_url,
+                       thumbnail_url=thumbnail_url)
+
+    session = Session()
+    session.add(video_obj)
+    session.commit()
+    session.close()
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
