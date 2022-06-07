@@ -10,6 +10,8 @@ from course_backend.models.users import Users, UserType
 from course_backend.schemas import CreateCourse, \
     UpdateCourse, CreateVideos, UpdateVideosData
 from course_backend.utils import *
+from fastapi import File, UploadFile
+import shutil
 
 
 router = APIRouter(
