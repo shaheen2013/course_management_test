@@ -1,11 +1,12 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from course.models.users import Users
-from course.schemas import UpdateUser, CreateUser
+from course.schemas import UpdateUser, CreateUser, TokenUser
 from course.utils import *
 from course.utils.hashing import Hash
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from course.authentication import oauth2
 from course.config.database import Session, add_model_data, update_model_data,\
     delete_model_data
 
@@ -25,15 +26,15 @@ async def create_user(request: CreateUser):
 
 
 @router.get("/{id}")
-async def find_user(id: int):
+async def find_user(id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     session = Session()
     user = session.query(Users).filter(Users.id == id).first()
     session.close()
     return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"user": user})))
 
 
-@router.get("/list")
-async def get_users(page_size: int = 10, page: int = 1):
+@router.get("/lists")
+async def get_users(page_size: int = 10, page: int = 1, current_user: TokenUser = Depends(oauth2.get_current_user)):
     if (page_size > 100 or page_size < 0):
         page_size = 100
     page -= 1
@@ -44,13 +45,13 @@ async def get_users(page_size: int = 10, page: int = 1):
 
 
 @router.put("/update")
-async def update_user(request: UpdateUser):
+async def update_user(request: UpdateUser, current_user: TokenUser = Depends(oauth2.get_current_user)):
     update_model_data(Users, request)
     return JSONResponse(status_code=200, content=get_success_msg())
 
 
 @router.delete("/delete")
-async def delete_user(id: int):
+async def delete_user(id: int, current_user: TokenUser = Depends(oauth2.get_current_user)):
     delete_model_data(Users, id)
     return JSONResponse(status_code=200, content=get_success_msg())
 

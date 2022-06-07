@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from course.config.database import Session
 from course.models.course import Purchase
 from course.models.users import Users, UserType
-from course.schemas import CreatePurchase
+from course.schemas import CreatePurchase, TokenUser
+from course.authentication import oauth2
 from course.utils import *
 
 
@@ -15,7 +16,7 @@ router = APIRouter(
 
 
 @router.post("/create")
-async def purchase_create(request: CreatePurchase):
+async def purchase_create(request: CreatePurchase, current_user: TokenUser = Depends(oauth2.get_current_user)):
     session = Session()
     purchase = request.dict()
     user = session.query(Users).filter(Users.id == purchase.get("user_id")).first()
