@@ -8,8 +8,8 @@ from config.settings import DATABASE_URL
 from models.course import Courses, Videos, Purchase
 from models.users import Users, UserType
 from models.base import Base
-from schemas import UpdateUserData, CreateUserData, CreateCourseData, \
-    UpdateCourseData, CreateVideosData, UpdateVideosData, CreatePurchaseData, UpdatePurchaseData
+from schemas import UpdateUser, CreateUser, CreateCourse, \
+    UpdateCourse, CreateVideos, UpdateVideosData, CreatePurchase, UpdatePurchase
 from utils import *
 
 
@@ -28,7 +28,7 @@ app = FastAPI()
 
 
 @app.post("/user/create")
-async def create_user(user_data: CreateUserData):
+async def create_user(user_data: CreateUser):
     add_model_data(Users, user_data)
     return JSONResponse(status_code=200, content=get_success_msg())
 
@@ -53,7 +53,7 @@ async def get_users(page_size: int = 10, page: int = 1):
 
 
 @app.put("/user/update")
-async def update_user(user: UpdateUserData):
+async def update_user(user: UpdateUser):
     update_model_data(Users, user)
     return JSONResponse(status_code=200, content=get_success_msg())
 
@@ -65,7 +65,7 @@ async def delete_user(id: int):
 
 
 @app.post("/course/create")
-async def create_course(course: CreateCourseData):
+async def create_course(course: CreateCourse):
     session = Session()
     course = course.dict()
     user = session.query(Users).filter(Users.id == course.get("user_id")).first()
@@ -98,7 +98,7 @@ async def get_courses(page_size: int = 10, page: int = 1):
 
 
 @app.put("/course/update")
-async def update_course(course: UpdateCourseData):
+async def update_course(course: UpdateCourse):
     update_model_data(Courses, course)
     return JSONResponse(status_code=200, content=get_success_msg())
 
@@ -110,7 +110,7 @@ async def delete_course(id: int):
 
 
 @app.post("/course/video/create")
-async def create_video(video: CreateVideosData):
+async def create_video(video: CreateVideos):
     add_model_data(Videos, video)
     return JSONResponse(status_code=200, content=get_success_msg())
 
@@ -136,7 +136,7 @@ async def find_video_course_wise(course_id: int):
 
 
 @app.post("/purchase/create")
-async def purchase_create(purchase: CreatePurchaseData):
+async def purchase_create(purchase: CreatePurchase):
     session = Session()
     purchase = purchase.dict()
     user = session.query(Users).filter(Users.id == purchase.get("user_id")).first()

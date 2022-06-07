@@ -8,11 +8,11 @@ class CourseData(BaseModel):
     thumbnail_url: str
 
 
-class CreateCourseData(CourseData, CreateBaseDataModel):
+class CreateCourse(CourseData, CreateBaseDataModel):
     user_id: int
 
 
-class UpdateCourseData(CourseData, UpdateBaseModelData):
+class UpdateCourse(CourseData, UpdateBaseModelData):
     pass
 
 
@@ -25,7 +25,7 @@ class VideosData(BaseModel):
     free_preview: bool = False
 
 
-class CreateVideosData(VideosData, CreateBaseDataModel):
+class CreateVideos(VideosData, CreateBaseDataModel):
     course_id: int
 
 
@@ -39,9 +39,9 @@ class PurchaseData(BaseModel):
     purchase_amount: float
 
 
-class CreatePurchaseData(PurchaseData, CreateBaseDataModel):
+class CreatePurchase(PurchaseData, CreateBaseDataModel):
     pass
 
 
-class UpdatePurchaseData(PurchaseData, UpdateBaseModelData):
+class UpdatePurchase(PurchaseData, UpdateBaseModelData):
     pass

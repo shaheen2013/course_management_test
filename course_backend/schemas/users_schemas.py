@@ -16,11 +16,11 @@ class UserData(BaseModel):
     is_active: bool = True
 
 
-class CreateUserData(UserData, CreateBaseDataModel):
+class CreateUser(UserData, CreateBaseDataModel):
     hashed_password: str
     user_type: UserType
 
 
-class UpdateUserData(UserData, UpdateBaseModelData):
+class UpdateUser(UserData, UpdateBaseModelData):
     pass
 

@@ -1,2 +1,2 @@
-from .users_schemas import UpdateUserData, CreateUserData
-from .course_schemas import CreateCourseData, UpdateCourseData, CreateVideosData, UpdateVideosData, CreatePurchaseData, UpdatePurchaseData
+from .users_schemas import UpdateUser, CreateUser
+from .course_schemas import CreateCourse, UpdateCourse, CreateVideos, UpdateVideosData, CreatePurchase, UpdatePurchase
