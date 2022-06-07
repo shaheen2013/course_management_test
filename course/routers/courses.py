@@ -44,7 +44,7 @@ async def find_course(id: int, current_user: TokenUser = Depends(oauth2.get_curr
     return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"courses": course})))
 
 
-@router.get("/list")
+@router.post("/list")
 async def get_courses(page_size: int = 10, page: int = 1, current_user: TokenUser = Depends(oauth2.get_current_user)):
     if (page_size > 100 or page_size < 0):
         page_size = 100

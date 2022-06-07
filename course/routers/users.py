@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from course.models.users import Users
-from course.schemas import UpdateUser, CreateUser, TokenUser
+from course.schemas import UpdateUser, CreateUser, TokenUser, PageData
 from course.utils import *
 from course.utils.hashing import Hash
 from fastapi import APIRouter, Depends
@@ -33,8 +33,11 @@ async def find_user(id: int, current_user: TokenUser = Depends(oauth2.get_curren
     return JSONResponse(status_code=200, content=get_response_data(jsonable_encoder({"user": user})))
 
 
-@router.get("/lists")
-async def get_users(page_size: int = 10, page: int = 1, current_user: TokenUser = Depends(oauth2.get_current_user)):
+@router.post("/list")
+async def get_users(page: PageData, current_user: TokenUser = Depends(oauth2.get_current_user)):
+    data = page.dict()
+    page = data.get("page")
+    page_size = data.get("page_size")
     if (page_size > 100 or page_size < 0):
         page_size = 100
     page -= 1

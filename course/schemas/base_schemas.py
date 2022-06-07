@@ -13,3 +13,8 @@ class UpdateBaseModelData(BaseModel):
 
 class BaseModelData(CreateBaseDataModel, UpdateBaseModelData):
     pass
+
+
+class PageData(BaseModel):
+    page_size: int = 10
+    page: int = 1
