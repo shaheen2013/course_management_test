@@ -1,5 +1,5 @@
 from .base_schemas import UpdateBaseModelData, CreateBaseDataModel
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from enum import Enum
 
 
@@ -11,7 +11,7 @@ class UserType(str, Enum):
 
 class UserData(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     address = str
     is_active: bool = True
 
